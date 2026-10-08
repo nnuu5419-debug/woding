@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тойго Чакыруу | Жыргал & Гулина</title>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px;
+        }
+        .card {
+            background: #ffffff; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 500px; width: 100%; padding: 40px 30px;
+            text-align: center; border: 1px solid #f0e6d2;
+        }
+        .header-title { font-family: 'Marcellus', serif; color: #c5a059; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+        h1 { font-family: 'Marcellus', serif; font-size: 32px; color: #2c3e50; margin-bottom: 15px; }
+        .parents { font-size: 15px; color: #7f8c8d; margin-bottom: 25px; line-height: 1.6; }
+        .parents span { color: #c5a059; font-weight: 600; }
+        .divider { height: 2px; width: 60px; background-color: #c5a059; margin: 20px auto; border-radius: 2px; }
+        .info-box { background-color: #fcf8f2; border: 1px dashed #c5a059; border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left; }
+        .info-item { margin-bottom: 12px; font-size: 15px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
+        input, select { width: 100%; padding: 12px 15px; border: 1px solid #dcdde1; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #c5a059, #a37f3e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .btn-submit:disabled { background: #ccc; }
+        #alertMessage { margin-top: 15px; font-weight: 600; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header-title">Үйлпөнүү тоюна чакыруу</div>
+    <h1>Жыргал & Гулина</h1>
+    
+    <div class="parents">
+        Той ээлери:<br>
+        <span>Карабек & Ижабат</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="info-box">
+        <div class="info-item">📍 <strong>Дареги:</strong> Базар-Коргон ш., "Алтын Төр" рестораны</div>
+        <div class="info-item">⏰ <strong>Убактысы:</strong> Саат 18:00</div>
+    </div>
+
+    <form id="rsvpForm">
+        <div class="form-group">
+            <label for="fullName">Сиздин аты-жөнүңүз:</label>
+            <input type="text" id="fullName" placeholder="Мисалы: Асан Асанов" required>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Тойго келе аласызбы?</label>
+            <select id="status" onchange="toggleGuestCount()">
+                <option value="Барам">Ооба, буйруса баратам</option>
+                <option value="Бара албайм">Бара албайм</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="guestCountGroup">
+            <label for="guestCount">Канча киши болуп келесиздер?</label>
+            <select id="guestCount">
+                <option value="1 адам">1 адам</option>
+                <option value="2 адам">2 адам</option>
+                <option value="3 адам">3 адам</option>
+                <option value="4+ адам">4 же андан көп</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn-submit" id="submitBtn" onclick="sendToTelegram()">Жөнөтүү</button>
+        <div id="alertMessage"></div>
+    </form>
+</div>
+
+<script>
+    function toggleGuestCount() {
+        const status = document.getElementById('status').value;
+        const guestGroup = document.getElementById('guestCountGroup');
+        guestGroup.style.display = (status === 'Бара албайм') ? 'none' : 'block';
+    }
+
+    function sendToTelegram() {
+        const name = document.getElementById('fullName').value.trim();
+        const status = document.getElementById('status').value;
+        const count = document.getElementById('guestCount').value;
+        const alertBox = document.getElementById('alertMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Телеграм Боттун маалыматтары:
+        const botToken = "8663155247:AAGRliM0WPK_lDthLd-b6OjXMG-HlsNwh6I"; 
+        const chatId = "8643639509";
+
+        if (!name) {
+            alert('Сураныч, аты-жөнүңүздү жазыңыз!');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        alertBox.style.color = "#333";
+        alertBox.innerText = "Жөнөтүлүүдө...";
+
+        let message = `💍 *Тойго жаңы жооп келди!*\n\n`;
+        message += `👤 *Аты-жөнү:* ${name}\n`;
+        message += `📌 *Жообу:* ${status}\n`;
+        if (status === 'Барам') {
+            message += `👥 *Адам саны:* ${count}\n`;
+        }
+
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                alertBox.style.color = "green";
+                alertBox.innerText = "Чоң рахмат! Жообуңуз кабыл алынды.";
+                document.getElementById('rsvpForm').reset();
+            } else {
+                alertBox.style.color = "red";
+                alertBox.innerText = "Ката чыкты, кайра текшериңиз.";
+            }
+            submitBtn.disabled = false;
+        })
+        .catch(error => {
+            alertBox.style.color = "red";
+            alertBox.innerText = "Тармакта ката бар.";
+            submitBtn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>
